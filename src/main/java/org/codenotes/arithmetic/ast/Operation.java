@@ -44,12 +44,12 @@ public record Operation(String assign, String val1, String val2, Type op) {
         return this;
     }
 
-    public static enum Type {
+    public enum Type {
         ADD("+ "), SUB("- "), TIM("* "), DIV("/ "), EQ("=");
 
         private final String str;
 
-        private Type(String str) {
+        Type(String str) {
             this.str = str;
         }
 
