@@ -1,0 +1,59 @@
+package org.codenotes.arithmetic.analyzer.syntax;
+
+import org.codenotes.arithmetic.ast.Operation;
+import org.codenotes.arithmetic.ast.Operation.Type;
+import org.codenotes.arithmetic.analyzer.lexic.ArithmeticLexAnalizer;
+
+parser code {:
+  public ArithmeticParser(ArithmeticLexAnalizer lexer) {
+    super(lexer);
+  }
+:}
+
+terminal NUMBER, ID, LEFT_PAR, RIGHT_PAR, TIMES, DIV, PLUS,
+         MINUS, UNARY_MINUS, ASSIGN, SEPARATOR;
+
+non terminal Operation syntax, assign, expr;
+
+precedence right ASSIGN;
+precedence left PLUS, MINUS;
+precedence left TIMES, DIV;
+precedence right UNARY_MINUS;
+precedence left LEFT_PAR;
+
+start with syntax;
+
+syntax ::= syntax assign:assign SEPARATOR
+           {:  :}
+           |
+           ;
+
+assign ::= ID:id ASSIGN expr:expr
+           {: RESULT = new Operation(id.toString(), expr, Type.EQ).print(); :}
+           ;
+
+expr ::= LEFT_PAR expr:expr RIGHT_PAR
+         {: RESULT = new Operation("t", expr, null); :}
+         |
+         expr:expr1 PLUS expr:expr2
+         {: RESULT = new Operation("t", expr1, expr2, Type.ADD); :}
+         |
+         expr:expr1 MINUS expr:expr2
+         {: RESULT = new Operation("t", expr1, expr2, Type.SUB); :}
+         |
+         expr:expr1 TIMES expr:expr2
+         {: RESULT = new Operation("t", expr1, expr2, Type.TIM); :}
+         |
+         expr:expr1 DIV expr:expr2
+         {: RESULT = new Operation("t", expr1, expr2, Type.DIV); :}
+         |
+         MINUS expr:expr
+         {: RESULT = new Operation("t", null, expr, Type.SUB); :}
+         %prec UNARY_MINUS
+         |
+         NUMBER:num
+         {: RESULT = new Operation(null, num.toString(), null, null); :}
+         |
+         ID:id
+         {: RESULT = new Operation(null, id.toString(), null, null); :}
+         ;
